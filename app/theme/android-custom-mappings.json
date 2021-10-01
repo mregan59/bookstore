@@ -1,0 +1,17 @@
+{
+    "fontWeights": {
+        "text-heading-1-font-weight": "bold",
+        "text-heading-2-font-weight": "bold",
+        "text-heading-3-font-weight": "bold",
+        "text-heading-4-font-weight": "bold",
+        "text-heading-5-font-weight": "bold",
+        "text-heading-6-font-weight": "bold",
+        "text-subtitle-1-font-weight": "bold",
+        "text-subtitle-2-font-weight": "bold",
+        "text-paragraph-1-font-weight": "400",
+        "text-paragraph-2-font-weight": "400",
+        "text-caption-1-font-weight": "400",
+        "text-caption-2-font-weight": "bold",
+        "text-label-font-weight": "bold"
+    }
+}

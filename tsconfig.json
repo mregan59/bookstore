@@ -13,8 +13,9 @@
     "sourceMap": true,
     "target": "esnext",
     "lib": ["esnext"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules"],
-  "include": ["App.js", "app", "test", "storybook"]
+  "include": ["App.js", "app", "test", "storybook2"]
 }

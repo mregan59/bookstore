@@ -9,27 +9,34 @@
  * The app navigation resides in ./app/navigation, so head over there
  * if you're interested in adding screens and navigators.
  */
-import "./i18n"
+import "./utils/i18n"
 import "./utils/ignore-warnings"
 import React, { useState, useEffect, useRef } from "react"
 import { NavigationContainerRef } from "@react-navigation/native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 import { initFonts } from "./theme/fonts" // expo
 import * as storage from "./utils/storage"
+import * as eva from '@eva-design/eva'
 import {
-  useBackButtonHandler,
-  RootNavigator,
-  canExit,
-  setRootNavigation,
-  useNavigationPersistence,
+    useBackButtonHandler,
+    RootNavigator,
+    canExit,
+    setRootNavigation,
+    useNavigationPersistence,
 } from "./navigation"
-import { RootStore, RootStoreProvider, setupRootStore } from "./models"
-import { ToggleStorybook } from "../storybook/toggle-storybook"
-
+import { RootStore, RootStoreProvider, setupRootStore } from "./store"
+import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components'
+import { EvaIconsPack } from '@ui-kitten/eva-icons'
+import mapping from './theme/custom-mapping.json'
+import android from './theme/android-custom-mappings.json'
+import { Platform } from 'react-native'
 // This puts screens in a native ViewController or Activity. If you want fully native
 // stack navigation, use `createNativeStackNavigator` in place of `createStackNavigator`:
 // https://github.com/kmagiera/react-native-screens#using-native-stack-navigator
 import { enableScreens } from "react-native-screens"
+import Reactotron from 'reactotron-react-native'
+import { isEmpty } from 'lodash'
+
 enableScreens()
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
@@ -38,44 +45,59 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
  * This is the root component of our app.
  */
 function App() {
-  const navigationRef = useRef<NavigationContainerRef>()
-  const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
+    const navigationRef = useRef<NavigationContainerRef>()
+    const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
+    const androidMapping = { ...mapping, strict: { ...mapping.strict, ...android.fontWeights } }
+    const customMapping = Platform.OS === 'android' ? androidMapping : mapping
 
-  setRootNavigation(navigationRef)
-  useBackButtonHandler(navigationRef, canExit)
-  const { initialNavigationState, onNavigationStateChange } = useNavigationPersistence(
-    storage,
-    NAVIGATION_PERSISTENCE_KEY,
-  )
+    setRootNavigation(navigationRef)
+    useBackButtonHandler(navigationRef, canExit)
+    const { initialNavigationState, onNavigationStateChange } = useNavigationPersistence(
+        storage,
+        NAVIGATION_PERSISTENCE_KEY,
+    )
 
-  // Kick off initial async loading actions, like loading fonts and RootStore
-  useEffect(() => {
-    ;(async () => {
-      await initFonts() // expo
-      setupRootStore().then(setRootStore)
-    })()
-  }, [])
+    // Kick off initial async loading actions, like loading fonts and RootStore
+    useEffect(() => {
+        (async () => {
+            await initFonts() // expo
+            setupRootStore().then((store) => {
+                if (isEmpty(store.profileList?.queries)) {
+                    Reactotron.display({
+                        name: 'SETUP',
+                        preview: 'setup',
+                        value: store,
+                    })
+                    store.profileList.createQuery('search', 2)
+                    store.profileList.createQuery('birthdays', 3)
+                }
+                setRootStore(store)
+            }
+            )
+        })()
+    }, [])
 
-  // Before we show the app, we have to wait for our state to be ready.
-  // In the meantime, don't render anything. This will be the background
-  // color set in native by rootView's background color. You can replace
-  // with your own loading component if you wish.
-  if (!rootStore) return null
+    // Before we show the app, we have to wait for our state to be ready.
+    // In the meantime, don't render anything. This will be the background
+    // color set in native by rootView's background color. You can replace
+    // with your own loading component if you wish.
+    if (!rootStore) return null
 
-  // otherwise, we're ready to render the app
-  return (
-    <ToggleStorybook>
-      <RootStoreProvider value={rootStore}>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <RootNavigator
-            ref={navigationRef}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
-        </SafeAreaProvider>
-      </RootStoreProvider>
-    </ToggleStorybook>
-  )
+    // otherwise, we're ready to render the app
+    return (
+        <RootStoreProvider value={rootStore}>
+            <IconRegistry icons={EvaIconsPack} />
+            <ApplicationProvider customMapping={customMapping} {...eva} theme={eva.dark}>
+                <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                    <RootNavigator
+                        ref={navigationRef}
+                        initialState={initialNavigationState}
+                        onStateChange={onNavigationStateChange}
+                    />
+                </SafeAreaProvider>
+            </ApplicationProvider>
+        </RootStoreProvider>
+    )
 }
 
 export default App

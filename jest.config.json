@@ -1,0 +1,10 @@
+{
+    "jest": {
+        "globals": {
+            "__DEV__": true
+        },
+        "moduleNameMapper": {
+            "^react-native$": "react-native-web",
+        }
+    }
+}
