@@ -53,35 +53,69 @@ export const defaultProfiles: ProfileModel[] = [
         id: "1",
         name: "Caroline",
         age: 24,
+        color: 'blue'
         // profile: require("./assets/1.jpg"),
     },
     {
         id: "2",
         name: "Jack",
         age: 30,
+        color: 'hotpink'
         // profile: require("./assets/2.jpg"),
     },
     {
         id: "3",
         name: "Anet",
         age: 21,
+        color: 'green'
+        // profile: require("./assets/3.jpg"),
+    },
+    {
+        id: "12",
+        name: "Anet",
+        age: 21,
+        color: 'mediumpurple'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "4",
+        name: "Anet",
+        age: 21,
+        color: 'cyan'
+        // profile: require("./assets/3.jpg"),
+    },
+    {
+        id: "5",
+        name: "Anet",
+        age: 21,
+        color: 'yellow'
+        // profile: require("./assets/3.jpg"),
+    },
+    {
+        id: "6",
+        name: "Anet",
+        age: 21,
+        color: 'gray'
+        // profile: require("./assets/3.jpg"),
+    },
+    {
+        id: "7",
         name: "John",
         age: 28,
+        color: 'green'
         // profile: require("./assets/4.jpg"),
     },
 ]
 
 export const Profiles = () => {
     const topCard = useRef<SwipeHandler>(null)
-    const scale = useSharedValue(0)
     const [profiles, setProfiles] = useState(defaultProfiles)
-    const onSwipe = useCallback(() => {
-        setProfiles(profiles.slice(0, profiles.length - 1))
-    }, [profiles])
+    const onSwipe = () => {
+        setProfiles(profiles.slice(1))
+    }
+
+    const ref = topCard
+    const topTwoProfiles = profiles.filter((p, i) => i <= 1).reverse()
     return (
         <SafeAreaView style={styles.container}>
             {/* <View style={styles.header}>
@@ -89,20 +123,14 @@ export const Profiles = () => {
                 <Icon name="message-circle" size={32} color="gray" />
             </View> */}
             <View style={styles.cards}>
-                {profiles.map((profile, index) => {
-                    const onTop = index === profiles.length - 1
-                    const ref = onTop ? topCard : null
-                    return (
-                        <Swipeable
-                            ref={ref}
-                            key={profile.id}
-                            profile={profile}
-                            scale={scale}
-                            onSwipe={onSwipe}
-                            onTop={onTop}
-                        />
-                    )
-                })}
+
+                <Swipeable key={topTwoProfiles[1] ? topTwoProfiles[1].id : 12}
+                    ref={ref}
+                    profiles={topTwoProfiles}
+                    // scale={scale}
+                    onSwipe={onSwipe}
+                // onTop={onTop}
+                />
             </View>
             <View style={styles.footer}>
                 <RectButton
@@ -123,6 +151,7 @@ export const Profiles = () => {
                     <Text>Like</Text>
                     {/* <Icon name="heart" size={32} color="#6ee3b4" /> */}
                 </RectButton>
+
             </View>
         </SafeAreaView>
     )

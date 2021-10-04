@@ -1,13 +1,10 @@
 /* global __DEV__ */
-import React, { forwardRef, Ref, useImperativeHandle, useEffect } from "react"
+import React, { forwardRef, Ref, useImperativeHandle } from "react"
 import { StyleSheet, Dimensions, View } from "react-native"
 import {
     PanGestureHandler,
-    PanGestureHandlerGestureEvent,
 } from "react-native-gesture-handler"
 import Animated, {
-    Extrapolate,
-    interpolate,
     runOnJS,
     useAnimatedGestureHandler,
     useSharedValue,
@@ -29,9 +26,7 @@ export interface SwipeHandler {
 
 interface SwiperProps {
     onSwipe: () => void;
-    profile: ProfileModel;
-    scale: Animated.SharedValue<number>;
-    onTop: boolean;
+    profiles: ProfileModel[];
 }
 
 const swipe = (
@@ -56,8 +51,12 @@ const swipe = (
         }
     )
 }
+
 const Swiper = (
-    { onSwipe, profile, scale, onTop }: SwiperProps,
+    {
+        onSwipe,
+        profiles,
+    }: SwiperProps,
     ref: Ref<SwipeHandler>
 ) => {
     const translateX = useSharedValue(0)
@@ -80,12 +79,6 @@ const Swiper = (
         onActive: ({ translationX, translationY }, { x, y }) => {
             translateX.value = x + translationX
             translateY.value = y + translationY
-            scale.value = interpolate(
-                translateX.value,
-                [-width / 2, 0, width / 2],
-                [1, 0.95, 1],
-                Extrapolate.CLAMP
-            )
         },
         onEnd: ({ velocityX, velocityY }) => {
             const dest = snapPoint(translateX.value, velocityX, snapPoints)
@@ -95,17 +88,26 @@ const Swiper = (
     })
     return (
         <View>
+            {/* <Animated.View style={StyleSheet.absoluteFill}> */}
+            {profiles[1] && <Profile key={1}
+                profile={profiles[0]}
+                translateX={translateX}
+                translateY={translateY}
+                onTop={false}
+            />}
+            {/* </Animated.View> */}
             <PanGestureHandler onGestureEvent={onGestureEvent}>
                 <Animated.View style={StyleSheet.absoluteFill}>
                     <Profile
-                        profile={profile}
+                        key={2}
+                        profile={profiles[1] || profiles[0]}
                         translateX={translateX}
                         translateY={translateY}
-                        scale={scale}
-                        onTop={onTop}
+                        onTop={true}
                     />
                 </Animated.View>
             </PanGestureHandler>
+
         </View>
 
     )

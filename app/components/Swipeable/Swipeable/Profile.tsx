@@ -6,10 +6,7 @@ import Animated, {
     interpolate,
     useAnimatedStyle,
     useDerivedValue,
-    withSpring,
-    useSharedValue
 } from "react-native-reanimated"
-import { useDidUpdateEffect } from '../../../utils/hooks'
 
 export interface ProfileModel {
     id: string;
@@ -71,7 +68,6 @@ interface CardProps {
     profile: ProfileModel;
     translateX: Animated.SharedValue<number>;
     translateY: Animated.SharedValue<number>;
-    scale: Animated.SharedValue<number>;
     onTop: boolean;
 }
 
@@ -80,42 +76,46 @@ const Profile = ({
     translateX,
     translateY,
     onTop,
-    scale: incomingScale,
+    undoable
+    // scale,
 }: CardProps) => {
-    const scale = useSharedValue(onTop ? 1 : 0)
-    const x = useDerivedValue(() => (onTop ? translateX.value : 0))
+    const x = useDerivedValue(() => (translateX.value))
 
-    useDidUpdateEffect(() => {
-        if (onTop) {
-            scale.value = withSpring(1)
-        }
-    }, [onTop])
+    console.log('x.value')
+    console.log(x.value)
 
     const container = useAnimatedStyle(() => ({
         transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value },
+            { translateX: onTop ? translateX.value : 0 },
+            { translateY: onTop ? translateY.value : 0 },
             {
-                rotate: `${interpolate(
+                scale: onTop ? 1 : interpolate(
+                    x.value,
+                    [-width / 2, 0, width / 2],
+                    [1, 0.6, 1],
+                    Extrapolate.CLAMP
+                )
+            },
+            {
+                rotate: onTop ? `${interpolate(
                     x.value,
                     [-width / 2, 0, width / 2],
                     [α, 0, -α],
                     Extrapolate.CLAMP
-                )}rad`,
+                )}rad` : '0rad',
             },
-            { scale: x.value > 0 ? incomingScale.value : scale.value },
         ],
     }))
     const nope = useAnimatedStyle(() => ({
-        opacity: interpolate(x.value, [-width / 4, 0], [1, 0]),
+        opacity: onTop ? interpolate(x.value, [-width / 4, 0], [1, 0]) : 0,
     }))
     const like = useAnimatedStyle(() => ({
-        opacity: interpolate(x.value, [0, width / 4], [0, 1], Extrapolate.CLAMP),
+        opacity: onTop ? interpolate(x.value, [0, width / 4], [0, 1], Extrapolate.CLAMP) : 0,
     }))
 
     return (
         <Animated.View style={[StyleSheet.absoluteFill, container]}>
-            <View style={{ ...styles.image, height: 200, width: 200, backgroundColor: 'hotpink' }}></View>
+            <View style={{ ...styles.image, height: 200, width: 200, backgroundColor: profile.color }}></View>
             {/* <Image style={styles.image} source={profile.profile} /> */}
             <View style={styles.overlay}>
                 <View style={styles.header}>
