@@ -12,7 +12,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { snapPoint } from "react-native-redash"
 
-import Profile, { ProfileModel, α } from "./Profile"
+import SwipeableCard, { α } from "./SwipeableCard"
 
 const { width, height } = Dimensions.get("window")
 
@@ -26,7 +26,9 @@ export interface SwipeHandler {
 
 interface SwiperProps {
     onSwipe: () => void;
-    profiles: ProfileModel[];
+    data: ProfileModel[];
+    renderItem: (props) => React.ReactElement
+    ;
 }
 
 const swipe = (
@@ -52,10 +54,11 @@ const swipe = (
     )
 }
 
-const Swiper = (
+const Swipeable = (
     {
         onSwipe,
-        profiles,
+        data,
+        renderItem,
     }: SwiperProps,
     ref: Ref<SwipeHandler>
 ) => {
@@ -86,25 +89,21 @@ const Swiper = (
             translateY.value = withSpring(0, { velocity: velocityY })
         },
     })
+    const bottomItem = renderItem({ translateX, translateY, onTop: false, data: data[0], key: 1 })
+    const topItem = renderItem({ translateX, translateY, onTop: true, data: data[1] || data[0], key: 2 })
     return (
         <View>
             {/* <Animated.View style={StyleSheet.absoluteFill}> */}
-            {profiles[1] && <Profile key={1}
-                profile={profiles[0]}
-                translateX={translateX}
-                translateY={translateY}
-                onTop={false}
-            />}
+            {data[1] && <SwipeableCard key={1} translateX={translateX} translateY={translateY} onTop={false}>
+                {bottomItem}
+            </SwipeableCard>}
             {/* </Animated.View> */}
             <PanGestureHandler onGestureEvent={onGestureEvent}>
                 <Animated.View style={StyleSheet.absoluteFill}>
-                    <Profile
-                        key={2}
-                        profile={profiles[1] || profiles[0]}
-                        translateX={translateX}
-                        translateY={translateY}
-                        onTop={true}
-                    />
+                    <SwipeableCard key={2} translateX={translateX} translateY={translateY} onTop={true}>
+                        {topItem}
+                    </SwipeableCard>
+
                 </Animated.View>
             </PanGestureHandler>
 
@@ -113,4 +112,4 @@ const Swiper = (
     )
 }
 
-export default forwardRef(Swiper)
+export default forwardRef(Swipeable)

@@ -1,1 +1,1 @@
-export { Profiles } from "./Profiles"
+export { Swiper } from "./Swiper"

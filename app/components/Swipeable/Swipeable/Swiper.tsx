@@ -2,8 +2,8 @@ import React, { useCallback, useRef, useState } from "react"
 import { SafeAreaView, StyleSheet, View, Text } from "react-native"
 import { RectButton } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
-
-import { ProfileModel } from "./Profile"
+// import Profile, { ProfileModel } from "./Profile"
+import { Card } from '../../../profile/card'
 import Swipeable, { SwipeHandler } from "./Swipeable"
 
 const styles = StyleSheet.create({
@@ -51,63 +51,63 @@ interface ProfilesProps {
 export const defaultProfiles: ProfileModel[] = [
     {
         id: "1",
-        name: "Caroline",
+        first_name: "Caroline",
         age: 24,
-        color: 'blue'
+        location: 'blue'
         // profile: require("./assets/1.jpg"),
     },
     {
         id: "2",
-        name: "Jack",
+        first_name: "Jack",
         age: 30,
-        color: 'hotpink'
+        location: 'hotpink'
         // profile: require("./assets/2.jpg"),
     },
     {
         id: "3",
-        name: "Anet",
+        first_name: "Anet",
         age: 21,
-        color: 'green'
+        location: 'green'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "12",
-        name: "Anet",
+        first_name: "Anet",
         age: 21,
-        color: 'mediumpurple'
+        location: 'mediumpurple'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "4",
-        name: "Anet",
+        first_name: "Anet",
         age: 21,
-        color: 'cyan'
+        location: 'cyan'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "5",
-        name: "Anet",
+        first_name: "Anet",
         age: 21,
-        color: 'yellow'
+        location: 'yellow'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "6",
-        name: "Anet",
+        first_name: "Anet",
         age: 21,
-        color: 'gray'
+        location: 'gray'
         // profile: require("./assets/3.jpg"),
     },
     {
         id: "7",
-        name: "John",
+        first_name: "John",
         age: 28,
-        color: 'green'
+        location: 'green'
         // profile: require("./assets/4.jpg"),
     },
 ]
 
-export const Profiles = () => {
+export const Swiper = () => {
     const topCard = useRef<SwipeHandler>(null)
     const [profiles, setProfiles] = useState(defaultProfiles)
     const onSwipe = () => {
@@ -116,17 +116,22 @@ export const Profiles = () => {
 
     const ref = topCard
     const topTwoProfiles = profiles.filter((p, i) => i <= 1).reverse()
+
+    const renderItem = ({ data, ...renderProps }) => {
+        return <Card profile={data} {...renderProps}></Card>
+    }
     return (
         <SafeAreaView style={styles.container}>
             {/* <View style={styles.header}>
-                <Icon name="user" size={32} color="gray" />
-                <Icon name="message-circle" size={32} color="gray" />
+                <Icon first_name="user" size={32} location="gray" />
+                <Icon first_name="message-circle" size={32} location="gray" />
             </View> */}
             <View style={styles.cards}>
 
                 <Swipeable key={topTwoProfiles[1] ? topTwoProfiles[1].id : 12}
                     ref={ref}
-                    profiles={topTwoProfiles}
+                    data={topTwoProfiles}
+                    renderItem={renderItem}
                     // scale={scale}
                     onSwipe={onSwipe}
                 // onTop={onTop}
@@ -140,7 +145,7 @@ export const Profiles = () => {
                     }}
                 >
                     <Text>Nope</Text>
-                    {/* <Icon name="x" size={32} color="#ec5288" /> */}
+                    {/* <Icon first_name="x" size={32} location="#ec5288" /> */}
                 </RectButton>
                 <RectButton
                     style={styles.circle}
@@ -149,7 +154,7 @@ export const Profiles = () => {
                     }}
                 >
                     <Text>Like</Text>
-                    {/* <Icon name="heart" size={32} color="#6ee3b4" /> */}
+                    {/* <Icon first_name="heart" size={32} location="#6ee3b4" /> */}
                 </RectButton>
 
             </View>
