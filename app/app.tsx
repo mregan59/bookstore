@@ -24,7 +24,8 @@ import {
     setRootNavigation,
     useNavigationPersistence,
 } from "./navigation"
-import { RootStore, RootStoreProvider, setupRootStore } from "./store"
+// import { RootStore, RootStoreProvider, setupRootStore } from "./store"
+import { RootStore, RootStoreProvider, setupRootStore } from "./models"
 import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components'
 import { EvaIconsPack } from '@ui-kitten/eva-icons'
 import mapping from './theme/custom-mapping.json'
@@ -36,6 +37,7 @@ import { Platform } from 'react-native'
 import { enableScreens } from "react-native-screens"
 import Reactotron from 'reactotron-react-native'
 import { isEmpty } from 'lodash'
+import { APIProvider } from './services/api/api-provider'
 
 enableScreens()
 
@@ -62,15 +64,15 @@ function App() {
         (async () => {
             await initFonts() // expo
             setupRootStore().then((store) => {
-                if (isEmpty(store.profileList?.queries)) {
-                    Reactotron.display({
-                        name: 'SETUP',
-                        preview: 'setup',
-                        value: store,
-                    })
-                    store.profileList.createQuery('search', 2)
-                    store.profileList.createQuery('birthdays', 3)
-                }
+                // if (isEmpty(store.profileList?.queries)) {
+                //     Reactotron.display({
+                //         name: 'SETUP',
+                //         preview: 'setup',
+                //         value: store,
+                //     })
+                //     store.profileList.createQuery('search', 2)
+                //     store.profileList.createQuery('birthdays', 3)
+                // }
                 setRootStore(store)
             }
             )
@@ -85,18 +87,20 @@ function App() {
 
     // otherwise, we're ready to render the app
     return (
-        <RootStoreProvider value={rootStore}>
-            <IconRegistry icons={EvaIconsPack} />
-            <ApplicationProvider customMapping={customMapping} {...eva} theme={eva.dark}>
-                <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-                    <RootNavigator
-                        ref={navigationRef}
-                        initialState={initialNavigationState}
-                        onStateChange={onNavigationStateChange}
-                    />
-                </SafeAreaProvider>
-            </ApplicationProvider>
-        </RootStoreProvider>
+        <APIProvider>
+            <RootStoreProvider value={rootStore}>
+                <IconRegistry icons={EvaIconsPack} />
+                <ApplicationProvider customMapping={customMapping} {...eva} theme={eva.dark}>
+                    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                        <RootNavigator
+                            ref={navigationRef}
+                            initialState={initialNavigationState}
+                            onStateChange={onNavigationStateChange}
+                        />
+                    </SafeAreaProvider>
+                </ApplicationProvider>
+            </RootStoreProvider>
+        </APIProvider>
     )
 }
 

@@ -1,69 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { View, TouchableWithoutFeedback, FlatList, RefreshControl } from 'react-native'
 import { Layout, Text, Button } from '@ui-kitten/components'
-import { useStores } from '../../store'
+import { useStores } from '../../models'
 import { dimensions } from '../../theme/variables'
 import { observer } from 'mobx-react-lite'
 import Reactotron from 'reactotron-react-native'
+// import { useQuery, useInfiniteQuery, useMutation } from 'react-query'
+import { useInfiniteQuery } from '../../utils/hooks'
+export const InfiniteScroll = observer(({ query = 'browses', renderItem }) => {
+    const store = useStores()
+    const fetchProfiles = ({ pageParam = 1 }) =>
+        store.profileList.getProfiles(pageParam, query)
 
-export const InfiniteScroll = observer(({ query: queryKey = 'search', renderItem }) => {
-    const { profileList } = useStores()
-    const [hasScrolled, setHasScrolled] = useState(false)
-    const [didLoad, setDidLoad] = useState(false)
-    const { queries } = profileList
-    const query = queries?.get(queryKey)
-    if (!query) {
+    const {
+        data,
+        fetchNextPage,
+        isFetching,
+        allData
+    } = useInfiniteQuery(query, fetchProfiles,)
+
+    const allProfiles = React.useMemo(() => allData?.map(p => store.profileList.profiles.get(p)), [allData])
+    const flatList = useRef(null)
+    if (!data) {
         return null
     }
-    const flatList = useRef(null)
-    useEffect(() => {
-        Reactotron.display({
-            name: 'QUERY',
-            preview: queryKey,
-            value: query,
-        })
-
-        if (!query.results || query.results.length === 0) {
-            query.getResults()
-            setDidLoad(true)
-        }
-    }, [])
 
     const onRefresh = () => {
-        setDidLoad(true)
-        query.getResults()
+        //  setDidLoad(true)
+        //  query.getResults()
+
     }
 
-    const onScroll = (e) => {
-        if (!hasScrolled) {
-            setHasScrolled(true)
-        }
-    }
     const onEndReached = (e) => {
-        if (!query.loading && query.current_page > 1 && !query.completed) {
-            query.getResults()
-        }
+        fetchNextPage()
     }
 
     return (
         <Layout>
-            <Text>{query.api}</Text>
+            <Text>Search</Text>
             <FlatList
                 refreshControl={
                     <RefreshControl
                         style={{
                             backgroundColor: 'transparent',
                         }}
-                        refreshing={query.loading && didLoad}
+                        refreshing={isFetching}
                         onRefresh={onRefresh}
                     />
                 }
                 style={{ height: dimensions.height }}
-                onScroll={onScroll}
                 scrollEventThrottle={60}
                 ref={flatList}
                 // style={styles.searchList}
-                data={query.results}
+                data={allProfiles}
                 initialNumToRender={1}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}

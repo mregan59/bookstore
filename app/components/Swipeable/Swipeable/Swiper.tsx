@@ -1,14 +1,14 @@
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback, useRef, useState, useEffect } from "react"
 import { SafeAreaView, StyleSheet, View, Text } from "react-native"
 import { RectButton } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 // import Profile, { ProfileModel } from "./Profile"
 import { SwipeableCard as Card } from '../../../profile/card'
 import Swipeable, { SwipeHandler } from "./Swipeable"
-import { useStores } from '../../../store'
+import { useStores } from '../../../models'
 import { observer } from 'mobx-react-lite'
 import Reactotron from 'reactotron-react-native'
-import { usePrevious } from "../../../utils/hooks"
+import { usePrevious, useInfiniteQuery } from "../../../utils/hooks"
 
 const styles = StyleSheet.create({
     cards: {
@@ -107,41 +107,49 @@ const styles = StyleSheet.create({
 //     },
 // ]
 
-export const Swiper = () => {
-    const { profileList } = useStores()
-    console.log(profileList)
-    const { queries } = profileList
-    const query = queries?.get('search')
-    if (!query) {
+export const Swiper = observer(({ query = "browses" }) => {
+    const store = useStores()
+    const fetchProfiles = ({ pageParam = 1 }) =>
+        store.profileList.getProfiles(pageParam, query)
+
+    const {
+        data,
+        fetchNextPage,
+        isFetching,
+        allData
+    } = useInfiniteQuery(query, fetchProfiles,)
+
+    const profiles = React.useMemo(() => allData?.map(p => store.profileList.profiles.get(p)), [allData])
+    console.log('profiles')
+    console.log(profiles)
+
+    const topCard = useRef<SwipeHandler>(null)
+    const [index, setIndex] = useState(0)
+    const onSwipe = () => {
+        setIndex(index + 1)
+        if (index >= profiles?.length - 5 && !isFetching) {
+            fetchNextPage()
+        }
+    }
+
+    if (!profiles) {
         return null
     }
-    const topCard = useRef<SwipeHandler>(null)
-    const [profiles, setProfiles] = useState(query.results)
-    const onSwipe = useCallback(() => {
-        setProfiles(profiles.slice(1))
-    }, [profiles])
-
     const ref = topCard
-    const topTwoProfiles = [...profiles.filter((p, i) => i <= 1)].reverse()
+    const topTwoProfiles = [...profiles.filter((p, i) => i === index || i === index + 1)].reverse()
 
     const renderItem = ({ data, ...renderProps }) => {
         return <Card profile={data} {...renderProps}></Card>
     }
     return (
         <SafeAreaView style={styles.container}>
-            {/* <View style={styles.header}>
-                <Icon first_name="user" size={32} location="gray" />
-                <Icon first_name="message-circle" size={32} location="gray" />
-            </View> */}
             <View style={styles.cards}>
 
                 <Swipeable
                     ref={ref}
                     data={topTwoProfiles}
                     renderItem={renderItem}
-                    // scale={scale}
                     onSwipe={onSwipe}
-                // onTop={onTop}
                 />
             </View>
             <View style={styles.footer}>
@@ -152,7 +160,6 @@ export const Swiper = () => {
                     }}
                 >
                     <Text>Nope</Text>
-                    {/* <Icon first_name="x" size={32} location="#ec5288" /> */}
                 </RectButton>
                 <RectButton
                     style={styles.circle}
@@ -161,10 +168,9 @@ export const Swiper = () => {
                     }}
                 >
                     <Text>Like</Text>
-                    {/* <Icon first_name="heart" size={32} location="#6ee3b4" /> */}
                 </RectButton>
 
             </View>
         </SafeAreaView>
     )
-}
+})

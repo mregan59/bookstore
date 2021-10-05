@@ -2,7 +2,7 @@ import { onSnapshot } from "mobx-state-tree"
 import { RootStoreModel, RootStore } from "./root-store"
 import { Environment } from "../environment"
 import * as storage from "../../utils/storage"
-
+import Reactotron from "reactotron-react-native"
 /**
  * The key we'll be saving our state as within async storage.
  */
@@ -49,7 +49,22 @@ export async function setupRootStore() {
   }
 
   // track changes & save to storage
-  onSnapshot(rootStore, (snapshot) => storage.save(ROOT_STATE_STORAGE_KEY, snapshot))
+  onSnapshot(rootStore, (snapshot) => {
+    Reactotron.display({
+      name: "SNAPSHOT",
+      preview: "snapshot",
+      value: snapshot,
+    })
+    storage.save(ROOT_STATE_STORAGE_KEY, snapshot)
+  })
+
+  //   onPatch(rootStore, (patch) => {
+  //     Reactotron.display({
+  //       name: patch.op.toUpperCase(),
+  //       preview: patch.path,
+  //       value: patch.value,
+  //     })
+  //   })
 
   return rootStore
 }

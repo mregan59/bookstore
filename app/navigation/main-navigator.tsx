@@ -21,24 +21,24 @@ import { WelcomeScreen, DemoScreen } from "../screens"
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  */
 export type PrimaryParamList = {
-  welcome: undefined
-  demo: undefined
+    welcome: undefined
+    demo: undefined
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createStackNavigator<PrimaryParamList>()
 
 export function MainNavigator() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="welcome" component={WelcomeScreen} />
-      <Stack.Screen name="demo" component={DemoScreen} />
-    </Stack.Navigator>
-  )
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}
+        >
+            <Stack.Screen name="welcome" component={WelcomeScreen} />
+            <Stack.Screen name="demo" component={DemoScreen} />
+        </Stack.Navigator>
+    )
 }
 
 /**
