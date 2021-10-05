@@ -1,5 +1,5 @@
 /* global __DEV__ */
-import React, { forwardRef, Ref, useImperativeHandle } from "react"
+import React, { useEffect, forwardRef, Ref, useImperativeHandle } from "react"
 import { StyleSheet, Dimensions, View } from "react-native"
 import {
     PanGestureHandler,
@@ -54,6 +54,21 @@ const swipe = (
     )
 }
 
+const MemoizedSwipeableCard = ({ onGestureEvent, translateX, translateY, onTop, data, renderItem }) => {
+    const item = renderItem({ translateX, translateY, onTop, data })
+    const renderContent = React.useMemo(() => <SwipeableCard translateX={translateX} translateY={translateY} onTop={onTop}>
+        {item}
+    </SwipeableCard>, [onTop, data.id])
+    // if (onTop) {
+    return (<PanGestureHandler onGestureEvent={onTop && onGestureEvent}>
+        <Animated.View style={StyleSheet.absoluteFill}>
+            {renderContent}
+        </Animated.View>
+    </PanGestureHandler>)
+    // }
+    // return renderContent
+}
+
 const Swipeable = (
     {
         onSwipe,
@@ -64,6 +79,12 @@ const Swipeable = (
 ) => {
     const translateX = useSharedValue(0)
     const translateY = useSharedValue(0)
+    console.log('PRFOILEs')
+    console.log(data)
+    useEffect(() => {
+        translateX.value = 0
+        translateY.value = 0
+    }, [data[0]])
 
     useImperativeHandle(ref, () => ({
         swipeLeft: () => {
@@ -89,23 +110,10 @@ const Swipeable = (
             translateY.value = withSpring(0, { velocity: velocityY })
         },
     })
-    const bottomItem = renderItem({ translateX, translateY, onTop: false, data: data[0], key: 1 })
-    const topItem = renderItem({ translateX, translateY, onTop: true, data: data[1] || data[0], key: 2 })
     return (
         <View>
-            {/* <Animated.View style={StyleSheet.absoluteFill}> */}
-            {data[1] && <SwipeableCard key={1} translateX={translateX} translateY={translateY} onTop={false}>
-                {bottomItem}
-            </SwipeableCard>}
-            {/* </Animated.View> */}
-            <PanGestureHandler onGestureEvent={onGestureEvent}>
-                <Animated.View style={StyleSheet.absoluteFill}>
-                    <SwipeableCard key={2} translateX={translateX} translateY={translateY} onTop={true}>
-                        {topItem}
-                    </SwipeableCard>
-
-                </Animated.View>
-            </PanGestureHandler>
+            {data.map((item, i) => <MemoizedSwipeableCard key={item.id} onGestureEvent={onGestureEvent} renderItem={renderItem} data={item}
+                translateX={translateX} translateY={translateY} onTop={i == 1}></MemoizedSwipeableCard>)}
 
         </View>
 

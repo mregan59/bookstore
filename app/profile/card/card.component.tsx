@@ -6,8 +6,22 @@ import { observer } from 'mobx-react-lite'
 import Reactotron from 'reactotron-react-native'
 import Animated, { Extrapolate, interpolate, useAnimatedStyle, useDerivedValue } from 'react-native-reanimated'
 import { dimensions } from '../../theme/variables'
+import { usePrevious } from '../../utils/hooks'
 const { width } = Dimensions.get("window")
-export const Card = observer(({ profile, onTop, translateX }) => {
+
+const MemoizedImage = React.memo(({ photo }) => {
+    return <Image style={{ height: 200, width: 120 }} source={{ uri: photo }} />
+}, (prevProps, nextProps) => {
+    console.log('prevProps HERE')
+    console.log(prevProps)
+    console.log(nextProps)
+    if (prevProps.photo == nextProps.photo) {
+        return true
+    }
+    return false
+})
+
+export const SwipeableCard = observer(({ profile, onTop, translateX }) => {
     const x = useDerivedValue(() => (translateX.value))
     useEffect(() => {
         //  Reactotron.log(profile)
@@ -35,6 +49,22 @@ export const Card = observer(({ profile, onTop, translateX }) => {
                     </Animated.View>
                 </View>
             </View>
+            <MemoizedImage photo={profile.photo} />
+            <Text>{profile.first_name}</Text>
+            <Text>{profile.location}</Text>
+            <Text>{profile.age}</Text>
+
+        </View>
+    )
+})
+export const Card = observer(({ profile }) => {
+    if (!profile) {
+        return null
+    }
+
+    return (
+        <View style={{ height: 300, width: 250, backgroundColor: 'green', borderRadius: 10 }}>
+
             <Image style={{ height: 200, width: 120 }} source={{ uri: profile.photo }} />
             <Text>{profile.first_name}</Text>
             <Text>{profile.location}</Text>
