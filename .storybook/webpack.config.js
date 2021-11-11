@@ -15,6 +15,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.join(__dirname, '/build'),
   },
+  type: "commonjs",
   resolve: {
     extensions: ['.web.js', '.js', '.jsx', '.json', '.ts', '.tsx'],
     alias: {
@@ -58,7 +59,7 @@ module.exports = {
         },
       },
       {
-        test: /@?(ui-kitten|eva-design|moti|react-native-reanimated).*\.(ts|js)x?$/,
+        test: /@?(ui-kitten|eva-design|moti|react-native-reanimated|react-query).*\.(ts|js)x?$/,
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
@@ -68,6 +69,14 @@ module.exports = {
             'react-native-reanimated/plugin',
           ],
         },
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader",
+          },
+        ],
       },
     ],
   },

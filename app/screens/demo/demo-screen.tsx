@@ -16,6 +16,6 @@ export const DemoScreen = observer(function DemoScreen() {
             <Text>Hi there</Text>
             <Button onPress={goBack}>Press</Button>
             <Swiper></Swiper>
-        </View >
+        </View>
     )
 })

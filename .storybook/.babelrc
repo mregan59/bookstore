@@ -1,4 +1,21 @@
 {
-    "presets": ["module:metro-react-native-babel-preset"],
-    "plugins": ["react-native-reanimated/plugin"]
-  }
+    "presets": [
+        "module:metro-react-native-babel-preset",
+        "babel/preset-react",
+        [
+            "babel/preset-env",
+            {
+                "targets": {
+                    "browsers": [
+                        "last 2 versions"
+                    ]
+                },
+                "debug": true,
+                "modules": "commonjs"
+            }
+        ]
+    ],
+    "plugins": [
+        "react-native-reanimated/plugin"
+    ]
+}

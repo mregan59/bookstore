@@ -8,6 +8,7 @@ import { default as android } from '../app/theme/android-custom-mappings.json'
 import {isEmpty} from 'lodash'
 
 import { RootStoreProvider, setupRootStore, useStores } from '../app/store'
+//import { APIProvider } from '../app/services/api/api-provider'
 
 export const decorators = [
   (Story) => {
@@ -35,6 +36,7 @@ export const decorators = [
       return null
     }
     return (
+        // <APIProvider>
         <RootStoreProvider value={rootStore}>
             <IconRegistry icons={EvaIconsPack} />
             <ApplicationProvider customMapping={customMapping} {...eva} theme={eva.dark}>
@@ -43,6 +45,7 @@ export const decorators = [
                 </Layout>
             </ApplicationProvider>
         </RootStoreProvider>
+        // </APIProvider>
       )
   }
 ];

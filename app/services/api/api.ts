@@ -40,7 +40,7 @@ export class Api {
       timeout: this.config.timeout,
       headers: {
         Accept: "application/json",
-        Authorization: "APPTOKEN ZZZQCTJSKBDQJFMZ",
+        Authorization: "APPTOKEN ZZZCCIDNSIQCRWFS",
         "X-App-Version": "1.3.6",
       },
     })
