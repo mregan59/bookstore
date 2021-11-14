@@ -6,7 +6,7 @@
  */
 import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
-import { WelcomeScreen, DemoScreen } from "../screens"
+import { WelcomeScreen, BookModal, DemoScreen } from "../screens"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -26,18 +26,24 @@ export type PrimaryParamList = {
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
-const Stack = createStackNavigator<PrimaryParamList>()
+
+const RootStack = createStackNavigator<PrimaryParamList>();
+
 
 export function MainNavigator() {
     return (
-        <Stack.Navigator
-            screenOptions={{
-                headerShown: false,
-            }}
-        >
-            <Stack.Screen name="welcome" component={WelcomeScreen} />
-            <Stack.Screen name="demo" component={DemoScreen} />
-        </Stack.Navigator>
+    <RootStack.Navigator>
+      <RootStack.Group  screenOptions={{
+        headerShown: false,
+      }}>
+        <RootStack.Screen name="welcome" component={WelcomeScreen} />
+        <RootStack.Screen name="demo" component={DemoScreen} />
+      </RootStack.Group>
+      <RootStack.Group screenOptions={{ presentation: 'modal' }}>
+        <RootStack.Screen name="book" component={BookModal} />
+      </RootStack.Group>
+    </RootStack.Navigator>
+
     )
 }
 

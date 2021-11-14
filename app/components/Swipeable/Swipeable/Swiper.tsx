@@ -7,8 +7,9 @@ import { SwipeableCard as Card } from '../../../profile/card'
 import Swipeable, { SwipeHandler } from "./Swipeable"
 import { useStores } from '../../../models'
 import { observer } from 'mobx-react-lite'
+import { useQueryClient } from 'react-query'
 import Reactotron from 'reactotron-react-native'
-import { usePrevious, useInfiniteQuery } from "../../../utils/hooks"
+import { usePrevious, useDidUpdateEffect, useInfiniteQuery, } from "../../../utils/hooks"
 
 const styles = StyleSheet.create({
     cards: {
@@ -111,22 +112,28 @@ export const Swiper = observer(({ query = "browses" }) => {
     const store = useStores()
     const fetchProfiles = ({ pageParam = 1 }) =>
         store.profileList.getProfiles(pageParam, query)
-
+    const topCard = useRef<SwipeHandler>(null)
+    const [index, setIndex] = useState(0)
     const {
         data,
         fetchNextPage,
         isFetching,
         allData
     } = useInfiniteQuery(query, fetchProfiles,)
+    const queryClient = useQueryClient()
 
     const profiles = React.useMemo(() => allData?.map(p => store.profileList.profiles.get(p)), [allData])
     console.log('profiles')
     console.log(profiles)
 
-    const topCard = useRef<SwipeHandler>(null)
-    const [index, setIndex] = useState(0)
     const onSwipe = () => {
-        setIndex(index + 1)
+        console.log('data')
+        console.log(data)
+        const data2 = { ...data }
+        const index2 = data2.pages.findIndex(pa => pa.profiles?.length > 0)
+        data2.pages[index2]?.profiles.splice(0, 1)
+        queryClient.setQueryData(query, data2)
+        // setIndex(index + 1)
         if (index >= profiles?.length - 5 && !isFetching) {
             fetchNextPage()
         }

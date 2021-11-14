@@ -1,12 +1,12 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { withEnvironment } from "../extensions/with-environment"
-import { ProfileList } from "../ProfileList/ProfileList"
+import { BookList } from "../BookList/BookList"
 /**
  * A RootStore model.
  */
 // prettier-ignore
 export const RootStoreModel = types.model("RootStore").props({
-  profileList: types.optional(ProfileList, {} as any),
+  bookList: types.optional(BookList, {} as any),
 
 })
   .extend(withEnvironment)

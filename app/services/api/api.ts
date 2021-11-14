@@ -38,11 +38,6 @@ export class Api {
     this.apisauce = create({
       baseURL: this.config.url,
       timeout: this.config.timeout,
-      headers: {
-        Accept: "application/json",
-        Authorization: "APPTOKEN ZZZCCIDNSIQCRWFS",
-        "X-App-Version": "1.3.6",
-      },
     })
   }
 
@@ -103,7 +98,11 @@ export class Api {
   }
 
   async getProfiles(page, apiKey = "browses") {
-    const endpoints = { browses: "/lists/browses", birthdays: "/list/birthdays", photos: "/photos" }
+    const endpoints = {
+      browses: "/lists/browses",
+      birthdays: "/search/newbies",
+      photos: "/photos",
+    }
     const response: ApiResponse<any> = await this.apisauce.get(`${endpoints[apiKey]}?page=${page}`)
     console.log("response")
     console.log(response)
@@ -131,6 +130,34 @@ export class Api {
         profiles: resultProfiles,
         nextPage: pagination.current_page + 1,
         totalPages: pagination.total_pages,
+      }
+    } catch {
+      return { kind: "bad-data" }
+    }
+  }
+
+  async getBook(isbn) {
+    const response: ApiResponse<any> = await this.apisauce.get(
+      `volumes?q=isbn:${isbn}&key=AIzaSyDqfFEV1-p2wlKV988jZlb-IO0bV53wVQE`,
+    )
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    console.log(response)
+    const raw = response.data.items[0]
+
+    const book = {
+      id: isbn, // raw.id,
+      title: raw.volumeInfo.title,
+      subtitle: raw.volumeInfo.subtitle,
+      description: raw.volumeInfo.description,
+      thumbnail: raw.volumeInfo.imageLinks.thumbnail,
+    }
+    try {
+      return {
+        kind: "ok",
+        book,
       }
     } catch {
       return { kind: "bad-data" }

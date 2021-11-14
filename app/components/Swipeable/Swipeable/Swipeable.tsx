@@ -79,8 +79,6 @@ const Swipeable = (
 ) => {
     const translateX = useSharedValue(0)
     const translateY = useSharedValue(0)
-    console.log('PRFOILEs')
-    console.log(data)
     useEffect(() => {
         translateX.value = 0
         translateY.value = 0

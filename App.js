@@ -10,5 +10,5 @@
 import App from "./app/app.tsx"
 import { AppRegistry } from "react-native"
 
-AppRegistry.registerComponent("CatholicMatch", () => App)
+AppRegistry.registerComponent("BookStore", () => App)
 export default App
